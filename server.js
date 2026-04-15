@@ -5,12 +5,17 @@ const XLSX = require("xlsx");
 const multer = require("multer");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const DATA_DIR = __dirname;
 const PECAS_FILE = path.join(DATA_DIR, "dados.json");
+const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 
-const upload = multer({ dest: path.join(DATA_DIR, "uploads") });
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+const upload = multer({ dest: UPLOADS_DIR });
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -234,6 +239,6 @@ app.post("/importar-excel", upload.single("arquivo"), (req, res) => {
 
 garantirArquivo();
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
