@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estoque de Peças</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:'Segoe UI',Roboto,Arial,sans-serif;
+background:#0f172a;
+padding:16px;
+color:#e5e7eb;
+min-height:100vh;
+}
+
+.container{
+max-width:100%;
+width:100%;
+margin:auto;
+background:#111827;
+padding:18px;
+border-radius:16px;
+border:1px solid #1f2937;
+overflow:hidden;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+font-size:30px;
+font-weight:700;
+color:#f8fafc;
+}
+
+.top{
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+margin-bottom:18px;
+padding:16px;
+background:#0f172a;
+border:1px solid #1f2937;
+border-radius:14px;
+}
+
+.top-left{
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+min-width:0;
+}
+
+.busca{
+padding:12px 14px;
+width:100%;
+border:1px solid #334155;
+border-radius:10px;
+background:#020617;
+color:#f8fafc;
+font-size:14px;
+outline:none;
+}
+
+.busca::placeholder{color:#94a3b8}
+.busca:focus{border-color:#38bdf8}
+
+.filtros{
+display:grid;
+grid-template-columns:repeat(3,minmax(180px,1fr));
+gap:10px;
+}
+
+.filtro-select,.filtro-input{
+width:100%;
+padding:12px 14px;
+border-radius:10px;
+border:1px solid #334155;
+background:#020617;
+color:#f8fafc;
+font-size:14px;
+outline:none;
+min-width:0;
+}
+
+.filtro-select:focus,.filtro-input:focus{
+border-color:#38bdf8;
+}
+
+.filtro-input::placeholder{color:#94a3b8}
+
+.top-right{
+display:flex;
+flex-direction:column;
+gap:10px;
+align-items:stretch;
+width:100%;
+min-width:0;
+}
+
+.total{
+font-weight:700;
+font-size:16px;
+color:#22c55e;
+background:#0b1220;
+border:1px solid #1f2937;
+padding:12px 14px;
+border-radius:10px;
+text-align:center;
+}
+
+.toolbar{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.form{
+display:grid;
+grid-template-columns:repeat(5,minmax(160px,1fr));
+gap:12px;
+margin:20px 0 24px;
+padding:16px;
+background:#0f172a;
+border:1px solid #1f2937;
+border-radius:14px;
+}
+
+input,select{
+width:100%;
+padding:12px 14px;
+border:1px solid #334155;
+border-radius:10px;
+background:#020617;
+color:#f8fafc;
+font-size:14px;
+outline:none;
+min-width:0;
+}
+
+input::placeholder{color:#94a3b8}
+input:focus,select:focus{border-color:#38bdf8}
+
+input[type="file"]{
+padding:8px;
+background:#0b1220;
+cursor:pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button{
+background:#1e293b;
+color:#e5e7eb;
+border:none;
+padding:8px 12px;
+border-radius:8px;
+margin-right:8px;
+cursor:pointer;
+}
+
+button{
+padding:12px 14px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:10px;
+cursor:pointer;
+font-size:14px;
+font-weight:600;
+transition:background .2s ease, transform .2s ease;
+white-space:nowrap;
+}
+
+button:hover{
+background:#1d4ed8;
+transform:translateY(-1px);
+}
+
+.btn-del{background:#dc2626}
+.btn-del:hover{background:#b91c1c}
+
+.btn-export{background:#16a34a}
+.btn-export:hover{background:#15803d}
+
+.btn-edit{background:#f59e0b}
+.btn-edit:hover{background:#d97706}
+
+.btn-az{background:#334155}
+.btn-az:hover{background:#475569}
+.btn-az.ativo{background:#06b6d4;color:#ecfeff}
+
+.btn-cancel{background:#64748b}
+.btn-cancel:hover{background:#475569}
+
+.btn-backup{background:#7c3aed}
+.btn-backup:hover{background:#6d28d9}
+
+.btn-import{background:#0ea5e9}
+.btn-import:hover{background:#0284c7}
+
+.form-actions{
+display:flex;
+gap:10px;
+grid-column:span 5;
+}
+
+.table-wrap{
+width:100%;
+overflow-x:auto;
+overflow-y:hidden;
+border-radius:14px;
+border:1px solid #1f2937;
+background:#0f172a;
+}
+
+.table-wrap::-webkit-scrollbar{
+height:12px;
+}
+
+.table-wrap::-webkit-scrollbar-track{
+background:#0b1220;
+border-radius:999px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb{
+background:#334155;
+border-radius:999px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb:hover{
+background:#475569;
+}
+
+table{
+width:max-content;
+min-width:100%;
+border-collapse:collapse;
+background:#0f172a;
+}
+
+thead th{
+background:#1e293b;
+color:#cfe7ff;
+font-size:13px;
+font-weight:700;
+padding:14px 12px;
+border-bottom:1px solid #334155;
+white-space:nowrap;
+}
+
+td{
+padding:12px 12px;
+text-align:center;
+border-bottom:1px solid #243041;
+color:#f1f5f9;
+font-size:14px;
+white-space:nowrap;
+background:#111827;
+}
+
+tbody tr:nth-child(odd) td{background:#111827;}
+tbody tr:nth-child(even) td{background:#0f172a;}
+tbody tr:hover td{background:#1b2638;}
+
+tr.estoque-baixo td{
+background:#3a1620 !important;
+}
+
+img{
+width:64px;
+height:64px;
+object-fit:cover;
+border-radius:10px;
+display:block;
+margin:auto;
+border:1px solid #334155;
+background:#020617;
+}
+
+.acoes{
+display:flex;
+gap:8px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.toast{
+position:fixed;
+top:20px;
+right:20px;
+min-width:280px;
+max-width:380px;
+padding:14px 16px;
+border-radius:12px;
+font-weight:600;
+z-index:9999;
+display:none;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.toast.show{display:block}
+.toast.success{background:#14532d;color:#dcfce7;border:1px solid #22c55e}
+.toast.error{background:#7f1d1d;color:#fee2e2;border:1px solid #ef4444}
+.toast.info{background:#0c4a6e;color:#e0f2fe;border:1px solid #38bdf8}
+
+.hidden{display:none!important}
+
+@media (max-width:1200px){
+.filtros{
+grid-template-columns:repeat(2,minmax(180px,1fr));
+}
+
+.form{
+grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.form-actions{
+grid-column:span 2;
+}
+
+table{
+min-width:1100px;
+}
+}
+
+@media (max-width:700px){
+body{
+padding:10px;
+}
+
+.container{
+padding:12px;
+}
+
+h1{
+font-size:24px;
+}
+
+.top-right,
+.top-left{
+width:100%;
+}
+
+.filtros{
+grid-template-columns:1fr;
+}
+
+.form{
+grid-template-columns:1fr;
+}
+
+.form-actions{
+grid-column:span 1;
+flex-direction:column;
+}
+
+.toolbar{
+flex-direction:column;
+}
+
+button,
+.filtro-select,
+.filtro-input{
+width:100%;
+}
+
+table{
+min-width:1000px;
+}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="container">
+<h1>Controle de Peças</h1>
+
+<div class="top">
+  <div class="top-left">
+    <input class="busca" id="busca" placeholder="Buscar geral..." onkeyup="render()">
+
+    <div class="filtros">
+      <select id="filtroEstoque" class="filtro-select" onchange="render()">
+        <option value="">Todos os estoques</option>
+        <option value="1">Estoque 1</option>
+        <option value="2">Estoque 2</option>
+        <option value="3">Estoque 3</option>
+      </select>
+
+      <select id="filtroCondicao" class="filtro-select" onchange="render()">
+        <option value="">Todas condições</option>
+        <option value="Novo">Novo</option>
+        <option value="Usado">Usado</option>
+      </select>
+
+      <input id="filtroCodigo" class="filtro-input" placeholder="Filtrar por código" onkeyup="render()">
+      <input id="filtroCarro" class="filtro-input" placeholder="Filtrar por carro" onkeyup="render()">
+      <input id="filtroLocalizacao" class="filtro-input" placeholder="Filtrar por localização" onkeyup="render()">
+
+      <select id="filtroBaixo" class="filtro-select" onchange="render()">
+        <option value="">Todos os estoques</option>
+        <option value="baixo">Somente estoque baixo</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="top-right">
+    <div class="total">Total de peças: <span id="total">0</span></div>
+    <div class="toolbar">
+      <button class="btn-az" id="btnAZ" onclick="toggleAZ()">Ordenar A–Z</button>
+      <button class="btn-export" onclick="exportarExcel()">Exportar Excel</button>
+      <button class="btn-backup" onclick="baixarBackup()">Backup JSON</button>
+      <button class="btn-import" onclick="document.getElementById('importExcel').click()">Importar Excel</button>
+      <input type="file" id="importExcel" class="hidden" accept=".xlsx,.xls" onchange="importarExcel(event)">
+    </div>
+  </div>
+</div>
+
+<div class="form">
+  <select id="estoque">
+    <option>1</option>
+    <option>2</option>
+    <option>3</option>
+  </select>
+
+  <input id="localizacao" placeholder="Localização">
+  <input id="codigo" placeholder="Código">
+  <input id="nome" placeholder="Nome">
+  <input id="carro" placeholder="Carro">
+
+  <select id="condicao">
+    <option>Novo</option>
+    <option>Usado</option>
+  </select>
+
+  <input type="number" id="quantidade" placeholder="Quantidade">
+  <input id="dataCadastro" type="date">
+  <input type="file" id="foto" accept="image/*">
+
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+
+  <div class="form-actions">
+    <button id="btnSalvar" onclick="salvarPeca()">Adicionar</button>
+    <button type="button" class="btn-cancel hidden" id="btnCancelarEdicao" onclick="cancelarEdicao()">Cancelar edição</button>
+  </div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Foto</th>
+<th>Estoque</th>
+<th>Local</th>
+<th>Código</th>
+<th>Nome</th>
+<th>Carro</th>
+<th>Condição</th>
+<th>Qtd</th>
+<th>Cadastro</th>
+<th>Ação</th>
+</tr>
+</thead>
+<tbody id="tabela"></tbody>
+</table>
+</div>
+</div>
+
+<script>
+let dados = []
+let modoOrdem = 0
+let codigoEditando = null
+let manterFotoEdicao = ""
+const LIMITE_ESTOQUE_BAIXO = 3
+
+async function carregar(){
+  try{
+    const res = await fetch("/pecas")
+    dados = await res.json()
+    render()
+  }catch(e){
+    mostrarToast("Erro ao carregar as peças.", "error")
+    console.error(e)
+  }
+}
+
+function formatarData(data){
+  if(!data) return ""
+  const d = new Date(data)
+  if(isNaN(d)) return data
+  return d.toLocaleDateString("pt-BR")
+}
+
+function mostrarToast(msg,tipo="info"){
+  const toast = document.getElementById("toast")
+  toast.className = `toast ${tipo} show`
+  toast.innerText = msg
+  clearTimeout(window.__toastTimer)
+  window.__toastTimer = setTimeout(()=>{
+    toast.className = "toast"
+  }, 3000)
+}
+
+function obterBuscaGeral(){
+  return document.getElementById("busca").value.toLowerCase().trim()
+}
+
+function render(){
+  const tabela = document.getElementById("tabela")
+  tabela.innerHTML = ""
+  let total = 0
+  let lista = [...dados]
+
+  const busca = obterBuscaGeral()
+  const filtroEstoque = document.getElementById("filtroEstoque").value
+  const filtroCondicao = document.getElementById("filtroCondicao").value
+  const filtroCodigo = document.getElementById("filtroCodigo").value.toLowerCase().trim()
+  const filtroCarro = document.getElementById("filtroCarro").value.toLowerCase().trim()
+  const filtroLocalizacao = document.getElementById("filtroLocalizacao").value.toLowerCase().trim()
+  const filtroBaixo = document.getElementById("filtroBaixo").value
+
+  if(filtroEstoque){
+    lista = lista.filter(p => String(p.estoque || "") === filtroEstoque)
+  }
+
+  if(filtroCondicao){
+    lista = lista.filter(p => String(p.condicao || "") === filtroCondicao)
+  }
+
+  if(filtroCodigo){
+    lista = lista.filter(p => String(p.codigo || "").toLowerCase().includes(filtroCodigo))
+  }
+
+  if(filtroCarro){
+    lista = lista.filter(p => String(p.carro || "").toLowerCase().includes(filtroCarro))
+  }
+
+  if(filtroLocalizacao){
+    lista = lista.filter(p => String(p.localizacao || "").toLowerCase().includes(filtroLocalizacao))
+  }
+
+  if(filtroBaixo === "baixo"){
+    lista = lista.filter(p => Number(p.quantidade || 0) <= LIMITE_ESTOQUE_BAIXO)
+  }
+
+  if(busca){
+    lista = lista.filter(p => {
+      const texto = [
+        p.estoque,p.localizacao,p.codigo,p.nome,p.carro,p.condicao,
+        p.quantidade,p.dataCadastro
+      ].join(" ").toLowerCase()
+      return texto.includes(busca)
+    })
+  }
+
+  if(modoOrdem === 1){
+    lista.sort((a,b)=>String(a.nome || "").localeCompare(String(b.nome || ""),'pt-BR'))
+  }else if(modoOrdem === 2){
+    lista.sort((a,b)=>String(b.nome || "").localeCompare(String(a.nome || ""),'pt-BR'))
+  }
+
+  lista.forEach(p=>{
+    total += Number(p.quantidade || 0)
+    const tr = document.createElement("tr")
+    if(Number(p.quantidade || 0) <= LIMITE_ESTOQUE_BAIXO) tr.classList.add("estoque-baixo")
+
+    tr.innerHTML = `
+      <td>${p.foto ? `<img src="${p.foto}" alt="Foto da peça">` : ""}</td>
+      <td>${p.estoque || ""}</td>
+      <td>${p.localizacao || ""}</td>
+      <td>${p.codigo || ""}</td>
+      <td>${p.nome || ""}</td>
+      <td>${p.carro || ""}</td>
+      <td>${p.condicao || ""}</td>
+      <td>${p.quantidade || 0}</td>
+      <td>${formatarData(p.dataCadastro)}</td>
+      <td>
+        <div class="acoes">
+          <button class="btn-edit" onclick="editar('${encodeURIComponent(String(p.codigo || ""))}')">Editar</button>
+          <button class="btn-del" onclick="deletar('${encodeURIComponent(String(p.codigo || ""))}')">Deletar</button>
+        </div>
+      </td>
+    `
+    tabela.appendChild(tr)
+  })
+
+  document.getElementById("total").innerText = total
+}
+
+function toggleAZ(){
+  modoOrdem = (modoOrdem + 1) % 3
+  const btn = document.getElementById("btnAZ")
+
+  if(modoOrdem === 0){
+    btn.classList.remove("ativo")
+    btn.innerText = "Ordenar A–Z"
+  }else if(modoOrdem === 1){
+    btn.classList.add("ativo")
+    btn.innerText = "Ordenado: A–Z"
+  }else{
+    btn.classList.add("ativo")
+    btn.innerText = "Ordenado: Z–A"
+  }
+
+  render()
+}
+
+function lerFoto(){
+  return new Promise((resolve,reject)=>{
+    const file = document.getElementById("foto").files[0]
+    if(!file){resolve("");return}
+    const reader = new FileReader()
+    reader.onload = e => resolve(e.target.result)
+    reader.onerror = () => reject(new Error("Erro ao ler a foto."))
+    reader.readAsDataURL(file)
+  })
+}
+
+function hojeISO(){
+  const d = new Date()
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth()+1).padStart(2,"0")
+  const dd = String(d.getDate()).padStart(2,"0")
+  return `${yyyy}-${mm}-${dd}`
+}
+
+function limparFormulario(){
+  document.getElementById("estoque").value = "1"
+  document.getElementById("localizacao").value = ""
+  document.getElementById("codigo").value = ""
+  document.getElementById("nome").value = ""
+  document.getElementById("carro").value = ""
+  document.getElementById("condicao").value = "Novo"
+  document.getElementById("quantidade").value = ""
+  document.getElementById("dataCadastro").value = hojeISO()
+  document.getElementById("foto").value = ""
+  document.getElementById("codigo").readOnly = false
+  document.getElementById("btnSalvar").innerText = "Adicionar"
+  document.getElementById("btnCancelarEdicao").classList.add("hidden")
+  codigoEditando = null
+  manterFotoEdicao = ""
+}
+
+function cancelarEdicao(){
+  limparFormulario()
+  mostrarToast("Edição cancelada.", "info")
+}
+
+async function salvarPeca(){
+  const quantidade = Number(document.getElementById("quantidade").value)
+  const codigo = document.getElementById("codigo").value.trim()
+  const nome = document.getElementById("nome").value.trim()
+
+  if(!codigo || !nome){
+    mostrarToast("Informe o código e o nome da peça.", "error")
+    return
+  }
+
+  if(!quantidade && quantidade !== 0){
+    mostrarToast("Informe a quantidade.", "error")
+    return
+  }
+
+  try{
+    const fotoNova = await lerFoto()
+    const fotoFinal = fotoNova || manterFotoEdicao
+
+    const p = {
+      estoque: document.getElementById("estoque").value,
+      localizacao: document.getElementById("localizacao").value.trim(),
+      codigo: codigo,
+      nome: nome,
+      carro: document.getElementById("carro").value.trim(),
+      condicao: document.getElementById("condicao").value,
+      quantidade: quantidade,
+      dataCadastro: document.getElementById("dataCadastro").value || hojeISO(),
+      foto: fotoFinal
+    }
+
+    let res
+    if(codigoEditando){
+      res = await fetch("/pecas/" + encodeURIComponent(codigoEditando), {
+        method: "PUT",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(p)
+      })
+    }else{
+      res = await fetch("/pecas", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(p)
+      })
+    }
+
+    const retorno = await res.json()
+
+    if(!res.ok){
+      mostrarToast(retorno.erro || "Erro ao salvar a peça.", "error")
+      return
+    }
+
+    mostrarToast(codigoEditando ? "Peça atualizada com sucesso." : "Peça adicionada com sucesso.", "success")
+    limparFormulario()
+    carregar()
+  }catch(e){
+    mostrarToast("Não foi possível salvar a peça.", "error")
+    console.error(e)
+  }
+}
+
+function editar(codigoCodificado){
+  const codigo = decodeURIComponent(codigoCodificado)
+  const p = dados.find(item => String(item.codigo) === String(codigo))
+  if(!p) return
+
+  document.getElementById("estoque").value = p.estoque || "1"
+  document.getElementById("localizacao").value = p.localizacao || ""
+  document.getElementById("codigo").value = p.codigo || ""
+  document.getElementById("nome").value = p.nome || ""
+  document.getElementById("carro").value = p.carro || ""
+  document.getElementById("condicao").value = p.condicao || "Novo"
+  document.getElementById("quantidade").value = p.quantidade ?? ""
+  document.getElementById("dataCadastro").value = p.dataCadastro || hojeISO()
+  document.getElementById("foto").value = ""
+
+  codigoEditando = p.codigo
+  manterFotoEdicao = p.foto || ""
+
+  document.getElementById("codigo").readOnly = true
+  document.getElementById("btnSalvar").innerText = "Salvar edição"
+  document.getElementById("btnCancelarEdicao").classList.remove("hidden")
+
+  window.scrollTo({top:0, behavior:"smooth"})
+  mostrarToast("Modo edição ativado.", "info")
+}
+
+async function deletar(codigoCodificado){
+  const codigo = decodeURIComponent(codigoCodificado)
+  const confirmar = confirm(`Tem certeza que deseja deletar a peça "${codigo}"?`)
+  if(!confirmar) return
+
+  try{
+    const res = await fetch("/pecas/" + encodeURIComponent(codigo), { method:"DELETE" })
+    const retorno = await res.json()
+
+    if(!res.ok){
+      mostrarToast(retorno.erro || "Erro ao deletar a peça.", "error")
+      return
+    }
+
+    if(String(codigoEditando) === String(codigo)){
+      limparFormulario()
+    }
+
+    mostrarToast("Peça deletada com sucesso.", "success")
+    carregar()
+  }catch(e){
+    mostrarToast("Erro ao deletar a peça.", "error")
+    console.error(e)
+  }
+}
+
+function exportarExcel(){
+  window.location.href = "/exportar-excel"
+}
+
+function baixarBackup(){
+  window.location.href = "/backup-json"
+}
+
+async function importarExcel(event){
+  const file = event.target.files[0]
+  if(!file) return
+
+  const formData = new FormData()
+  formData.append("arquivo", file)
+
+  try{
+    const res = await fetch("/importar-excel", {
+      method:"POST",
+      body: formData
+    })
+    const retorno = await res.json()
+
+    if(!res.ok){
+      mostrarToast(retorno.erro || "Erro ao importar Excel.", "error")
+      return
+    }
+
+    mostrarToast(retorno.mensagem || "Importação concluída.", "success")
+    event.target.value = ""
+    carregar()
+  }catch(e){
+    mostrarToast("Erro ao importar Excel.", "error")
+    console.error(e)
+  }
+}
+
+document.getElementById("dataCadastro").value = hojeISO()
+carregar()
+</script>
+</body>
+</html>
